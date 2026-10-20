@@ -1,0 +1,51 @@
+name: Publish HVOZD Web to gh-pages
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/publish.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout public deployment repository
+        uses: actions/checkout@v4
+
+      - name: Download prebuilt Web export (compiled files only)
+        shell: bash
+        env:
+          ARCHIVE_URL: "https://sdmntprnortheu.oaiusercontent.com/files/00000000-c69c-81f4-ae99-68e0294d0dab/raw?se=2026-10-20T14%3A41%3A17Z&sp=r&sv=2026-02-06&sr=b&scid=1c54cf6e-5ab1-57f6-9058-913d72b59975&skoid=002823aa-689d-47ca-9347-108c20f4f00d&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2026-10-20T08%3A54%3A32Z&ske=2026-10-21T08%3A54%3A32Z&sks=b&skv=2026-02-06&sig=XtL1YN0YZiZT%2B5bLpI2fb5RDbV0uSXQlu7bNG6o2ye0%3D"
+        run: |
+          set -euo pipefail
+          curl --fail --location --show-error --silent --retry 2 --max-time 120 "$ARCHIVE_URL" -o "$RUNNER_TEMP/hvozd-web.zip"
+          mkdir -p "$RUNNER_TEMP/hvozd-web"
+          unzip -q "$RUNNER_TEMP/hvozd-web.zip" -d "$RUNNER_TEMP/hvozd-web"
+          test -s "$RUNNER_TEMP/hvozd-web/index.html"
+          test -s "$RUNNER_TEMP/hvozd-web/index.js"
+          test -s "$RUNNER_TEMP/hvozd-web/index.wasm"
+          test -s "$RUNNER_TEMP/hvozd-web/index.pck"
+          echo "Compiled HVOZD Web build validated."
+
+      - name: Publish compiled files to gh-pages branch
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          cd "$RUNNER_TEMP/hvozd-web"
+          touch .nojekyll
+          git init -q
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git checkout -q -b gh-pages
+          git add .
+          git commit -qm 'Publish HVOZD Mobile Web Test 0.1'
+          git remote add origin "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+          git push --force origin HEAD:refs/heads/gh-pages
