@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
   push:
     paths:
-      - '.github/workflows/publish.yml'
+      - 'HVOZD-Mobile-Web-Test.zip'
 
 permissions:
   contents: write
@@ -18,20 +18,17 @@ jobs:
       - name: Checkout public deployment repository
         uses: actions/checkout@v4
 
-      - name: Download prebuilt Web export (compiled files only)
+      - name: Unpack previously compiled HVOZD Web build
         shell: bash
-        env:
-          ARCHIVE_URL: "https://sdmntprukwest.oaiusercontent.com/files/00000000-76ec-8243-baad-2428a21b1b3f/raw?se=2026-10-20T14%3A55%3A37Z&sp=r&sv=2026-02-06&sr=b&scid=e868c73d-0e1e-5e4e-9734-08771882c2a7&skoid=002823aa-689d-47ca-9347-108c20f4f00d&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2026-10-20T04%3A46%3A10Z&ske=2026-10-21T04%3A46%3A10Z&sks=b&skv=2026-02-06&sig=ZMHHcH1MQJiNPIrkO5mG9T%2BmdwhGEGfDIlL9WlWmdW8%3D"
         run: |
           set -euo pipefail
-          curl --fail --location --show-error --silent --retry 2 --max-time 120 "$ARCHIVE_URL" -o "$RUNNER_TEMP/hvozd-web.zip"
+          test -s HVOZD-Mobile-Web-Test.zip
           mkdir -p "$RUNNER_TEMP/hvozd-web"
-          unzip -q "$RUNNER_TEMP/hvozd-web.zip" -d "$RUNNER_TEMP/hvozd-web"
+          unzip -q HVOZD-Mobile-Web-Test.zip -d "$RUNNER_TEMP/hvozd-web"
           test -s "$RUNNER_TEMP/hvozd-web/index.html"
           test -s "$RUNNER_TEMP/hvozd-web/index.js"
           test -s "$RUNNER_TEMP/hvozd-web/index.wasm"
           test -s "$RUNNER_TEMP/hvozd-web/index.pck"
-          echo "Compiled HVOZD Web build validated."
 
       - name: Publish compiled files to gh-pages branch
         shell: bash
@@ -46,6 +43,6 @@ jobs:
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git checkout -q -b gh-pages
           git add .
-          git commit -qm 'Publish HVOZD Mobile Web Test 0.1'
+          git commit -qm 'Publish HVOZD Mobile Web build'
           git remote add origin "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
           git push --force origin HEAD:refs/heads/gh-pages
