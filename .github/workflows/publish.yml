@@ -21,7 +21,7 @@ jobs:
       - name: Download prebuilt Web export (compiled files only)
         shell: bash
         env:
-          ARCHIVE_URL: "https://sdmntprnortheu.oaiusercontent.com/files/00000000-c69c-81f4-ae99-68e0294d0dab/raw?se=2026-10-20T14%3A41%3A17Z&sp=r&sv=2026-02-06&sr=b&scid=1c54cf6e-5ab1-57f6-9058-913d72b59975&skoid=002823aa-689d-47ca-9347-108c20f4f00d&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2026-10-20T08%3A54%3A32Z&ske=2026-10-21T08%3A54%3A32Z&sks=b&skv=2026-02-06&sig=XtL1YN0YZiZT%2B5bLpI2fb5RDbV0uSXQlu7bNG6o2ye0%3D"
+          ARCHIVE_URL: "https://sdmntprukwest.oaiusercontent.com/files/00000000-76ec-8243-baad-2428a21b1b3f/raw?se=2026-10-20T14%3A55%3A37Z&sp=r&sv=2026-02-06&sr=b&scid=e868c73d-0e1e-5e4e-9734-08771882c2a7&skoid=002823aa-689d-47ca-9347-108c20f4f00d&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2026-10-20T04%3A46%3A10Z&ske=2026-10-21T04%3A46%3A10Z&sks=b&skv=2026-02-06&sig=ZMHHcH1MQJiNPIrkO5mG9T%2BmdwhGEGfDIlL9WlWmdW8%3D"
         run: |
           set -euo pipefail
           curl --fail --location --show-error --silent --retry 2 --max-time 120 "$ARCHIVE_URL" -o "$RUNNER_TEMP/hvozd-web.zip"
